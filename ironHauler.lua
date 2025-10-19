@@ -11,9 +11,10 @@ end
 local function uploadInventory()
     for slot = 1, 16 do
         local item = turtle.getItemDetail(slot)
+        print(item)
         if item then
             -- Send item into the ME Bridge
-            local countImported = me.importItem({name=item.name, count=item.count}, "front")
+            local countImported = me.importItem({name=item.name, count=item.count}, "back")
             print("Imported "..countImported.."x "..item.name)
             -- Clear leftover items if not fully imported
             turtle.select(slot)
