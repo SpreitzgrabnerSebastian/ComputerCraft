@@ -1,24 +1,29 @@
--- hauler_to_ae2.lua
--- This turtle will push everything in its inventory into the ME Bridge
+-- hauler_iron.lua
+-- Only imports iron ore and iron ingots into the ME Bridge on the back
 
--- Find the ME Bridge remotely
-local me = peripheral.find("me_bridge")
+-- Wrap the ME Bridge on the back side
+local me = peripheral.wrap("back")
 if not me then
-    error("No ME Bridge found!")
+    error("No ME Bridge found on back side!")
 end
 
--- Function to upload all items in the turtle inventory to AE2
-local function uploadInventory()
+-- Function to check if an item is iron ore or ingot
+local function isIron(item)
+    return item.name == "minecraft:iron_ore" or item.name == "minecraft:iron_ingot"
+end
+
+-- Upload all iron items
+local function uploadIron()
     for slot = 1, 16 do
         local item = turtle.getItemDetail(slot)
-        print(item)
-        if item then
-            -- Send item into the ME Bridge
+        if item and isIron(item) then
             local countImported = me.importItem({name=item.name, count=item.count}, "back")
             print("Imported "..countImported.."x "..item.name)
-            -- Clear leftover items if not fully imported
-            turtle.select(slot)
-            turtle.drop()
+            -- Remove leftovers if import didn't take all
+            if countImported < item.count then
+                turtle.select(slot)
+                turtle.drop()
+            end
         end
     end
     turtle.select(1)
@@ -26,7 +31,6 @@ end
 
 -- Main loop
 while true do
-    uploadInventory()
-    print("Sleeping 5 seconds before next check...")
-    sleep(5)  -- repeat every 5 seconds
+    uploadIron()
+    sleep(5) -- check every 5 seconds
 end
